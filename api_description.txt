@@ -20,7 +20,6 @@ Description: Lấy thông tin chung
     "waterRemaining": number,       // Lượng nước còn lại
     "roomTemperature": number,      // Nhiệt độ phòng (Celsius)
     "roomHumidity": number,         // Độ ẩm phòng (%)
-    "battery": number,              // Pin (%)     Chưa làm
     "latestImage": {
       "url": string,               // URL của hình ảnh chụp gần nhất
       "time": number          // Thời gian chụp (Unix timestamp)
