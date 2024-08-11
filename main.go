@@ -82,7 +82,8 @@ func main() {
 		fmt.Println(err.Error())
 	}
 
-	r := gin.Default()
+	a := gin.Default()
+	r := a.Group("/api")
 	r1 := r.Group("/schedule")
 	{
 		r1.POST("", schedule.CreateSchedule(db))
@@ -109,6 +110,6 @@ func main() {
 	{
 		r5.GET("/", home.GetHomeData(db))
 	}
-	r.Run(":3000")
+	a.Run(":3000")
 
 }
