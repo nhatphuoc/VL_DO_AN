@@ -1,0 +1,150 @@
+* Nếu có lỗi đều trả về:
+{
+  "error": string
+}
+
+
+Endpoint: /homeData
+Description: Lấy thông tin chung
+- Response:
+  {
+    "foodRemaining": number,        // Lượng đồ ăn còn lại
+    "waterRemaining": number,       // Lượng nước còn lại
+    "roomTemperature": number,      // Nhiệt độ phòng (Celsius)
+    "roomHumidity": number,         // Độ ẩm phòng (%)
+    "battery": number,              // Pin (%)     Chưa làm
+    "latestImage": {
+      "url": string,               // URL của hình ảnh chụp gần nhất
+      "time": number          // Thời gian chụp (Unix timestamp)
+    }
+  }
+
+### Endpoint: gallery
+- List environment(POST /gallery/list)
+  Request:
+  {
+    "startDate": number,             // Ngày bắt đầu (Unix timestamp)
+    "endDate": number                // Ngày kết thúc (Unix timestamp)
+  }
+  Response:
+  {
+    "galleryHistory": [
+      {
+        "url": string,               // URL của hình ảnh hoặc encode byte64
+        "time": number          // Thời gian chụp (Unix timestamp)
+      },
+      ...
+    ]
+  }
+- Create environment(POST /gallery/create)
+  Request:
+    {
+      "url": string,               // URL của hình ảnh hoặc encode byte64
+      "time": number          // Thời gian chụp (Unix timestamp)
+    }
+  Response:
+  true
+
+
+
+### Endpoint: foodDrink
+- List environment(POST /foodDrink/list)
+  Request:
+  {
+    "startDate": number,             // Ngày bắt đầu (Unix timestamp)
+    "endDate": number                // Ngày kết thúc (Unix timestamp)
+  }
+  Response:
+  {
+    "foodDrinkHistory": [
+      {
+        "food": number,             // Lượng thức ăn còn lại
+        "drink": number,             // Lượng nước uống còn lại
+        "time": number               // Thời gian (Unix timestamp)
+      },
+      ...
+    ]
+  }
+- Create environment(POST /foodDrink/create)
+  Request:
+    {
+        "food": number,             // Lượng thức ăn còn lại
+        "drink": number,             // Lượng nước uống còn lại
+        "time": number               // Thời gian (Unix timestamp)
+    }
+  Response:
+  true
+
+
+
+### Endpoint: Quản lý môi trường
+- List environment(POST /environment/list)
+  Request:
+  {
+    "startDate": number,             // Ngày bắt đầu (Unix timestamp)
+    "endDate": number                // Ngày kết thúc (Unix timestamp)
+  }
+  Response:
+  {
+    "environmentHistory": [
+      {
+        "temperature": number,             // Nhiệt độ (Celsius)
+        "humidity": number,             // Độ ẩm (Celsius)
+        "time": number               // Thời gian (Unix timestamp)
+      },
+      ...
+    ]
+  }
+- Create environment(POST /environment/create)
+  Request:
+  {
+        "temperature": number,             // Nhiệt độ (Celsius)
+        "humidity": number,             // Độ ẩm (Celsius)
+        "time": number               // Thời gian (Unix timestamp)
+  }
+  Response:
+  true
+
+
+### Description: Quản lý lịch ăn
+- Create schedule(POST /schedule/):
+  Request:
+    {
+        "value": number,               // Lượng thức ăn sẽ cho
+        "time": number,                // Thời gian cho ăn (Unix timestamp)
+        "isOn": boolean                // Bật hay tắt lịch này
+    }
+
+  Response:
+    true
+
+
+- Update schedule(PATCH /schedule/id):
+  Request:
+    {
+        "value": number,               // Lượng thức ăn sẽ cho
+        "time": number,                // Thời gian cho ăn (Unix timestamp)
+        "isOn": boolean                // Bật hay tắt lịch này
+    }
+
+  Response:
+    true
+
+
+- Delete schedule(DELETE /schedule/id):
+  Response:
+    true
+
+- List schedule(GET /schedule/):
+
+  {
+    "feedingSchedule": [
+      {
+        "id": number                 //ID
+        "value": number,             // Lượng thức ăn sẽ cho
+        "time": number,              // Thời gian cho ăn (Unix timestamp)
+        "isOn": boolean              // Bật hay tắt lịch này
+      },
+      ...
+    ]
+  }
