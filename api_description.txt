@@ -1,3 +1,11 @@
+* Chạy chương trình:
+- B1. Tải golang về:
+https://go.dev/dl/
+- B2. Cho chạy lệnh để thực hiện chương trình:
+go run main.go
+
+
+
 * Nếu có lỗi đều trả về:
 {
   "error": string
@@ -148,3 +156,5 @@ Description: Lấy thông tin chung
       ...
     ]
   }
+
+
