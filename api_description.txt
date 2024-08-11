@@ -1,7 +1,10 @@
 * Chạy chương trình:
 - B1. Tải golang về:
 https://go.dev/dl/
-- B2. Cho chạy lệnh để thực hiện chương trình:
+- B2. Tải mySQL:
+https://dev.mysql.com/downloads/mysql/
+Tải bản Windows (x86, 64-bit), MSI Installer	9.0.1
+- B3. Cho chạy lệnh để thực hiện chương trình:
 go run main.go
 
 
@@ -12,7 +15,7 @@ go run main.go
 }
 
 
-Endpoint: /homeData
+Endpoint: /api/homeData
 Description: Lấy thông tin chung
 - Response:
   {
@@ -27,7 +30,7 @@ Description: Lấy thông tin chung
   }
 
 ### Endpoint: gallery
-- List environment(POST /gallery/list)
+- List environment(POST /api/gallery/list)
   Request:
   {
     "startDate": number,             // Ngày bắt đầu (Unix timestamp)
@@ -43,7 +46,7 @@ Description: Lấy thông tin chung
       ...
     ]
   }
-- Create environment(POST /gallery/create)
+- Create environment(POST /api/gallery/create)
   Request:
     {
       "url": string,               // URL của hình ảnh hoặc encode byte64
@@ -55,7 +58,7 @@ Description: Lấy thông tin chung
 
 
 ### Endpoint: foodDrink
-- List environment(POST /foodDrink/list)
+- List environment(POST /api/foodDrink/list)
   Request:
   {
     "startDate": number,             // Ngày bắt đầu (Unix timestamp)
@@ -72,7 +75,7 @@ Description: Lấy thông tin chung
       ...
     ]
   }
-- Create environment(POST /foodDrink/create)
+- Create environment(POST /api/foodDrink/create)
   Request:
     {
         "food": number,             // Lượng thức ăn còn lại
@@ -85,7 +88,7 @@ Description: Lấy thông tin chung
 
 
 ### Endpoint: Quản lý môi trường
-- List environment(POST /environment/list)
+- List environment(POST /api/environment/list)
   Request:
   {
     "startDate": number,             // Ngày bắt đầu (Unix timestamp)
@@ -102,7 +105,7 @@ Description: Lấy thông tin chung
       ...
     ]
   }
-- Create environment(POST /environment/create)
+- Create environment(POST /api/environment/create)
   Request:
   {
         "temperature": number,             // Nhiệt độ (Celsius)
@@ -114,7 +117,7 @@ Description: Lấy thông tin chung
 
 
 ### Description: Quản lý lịch ăn
-- Create schedule(POST /schedule/):
+- Create schedule(POST /api/schedule/):
   Request:
     {
         "value": number,               // Lượng thức ăn sẽ cho
@@ -126,7 +129,7 @@ Description: Lấy thông tin chung
     true
 
 
-- Update schedule(PATCH /schedule/id):
+- Update schedule(PATCH /api/schedule/id):
   Request:
     {
         "value": number,               // Lượng thức ăn sẽ cho
@@ -138,11 +141,11 @@ Description: Lấy thông tin chung
     true
 
 
-- Delete schedule(DELETE /schedule/id):
+- Delete schedule(DELETE /api/schedule/id):
   Response:
     true
 
-- List schedule(GET /schedule/):
+- List schedule(GET /api/schedule/):
 
   {
     "feedingSchedule": [
