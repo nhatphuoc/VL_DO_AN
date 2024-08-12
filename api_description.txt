@@ -1,12 +1,6 @@
 * Chạy chương trình:
-- B1. Tải golang về:
-https://go.dev/dl/
-- B2. Tải mySQL:
-https://dev.mysql.com/downloads/mysql/
-Tải bản Windows (x86, 64-bit), MSI Installer	9.0.1
-- B3. Cho chạy lệnh để thực hiện chương trình:
-go run main.go
-
+docker-compose build 
+docker-compose up
 
 
 * Nếu có lỗi đều trả về:
