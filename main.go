@@ -9,6 +9,7 @@ import (
 	"go-module/home-data"
 	"go-module/schedule"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -20,7 +21,10 @@ func createDB() (*sql.DB,error) {
 	if err != nil {
 		return nil, err
 	}
-
+	// db, err := sql.Open("mysql", "nhatphuoc:123456789@tcp(localhost:3306)/")
+    // if err != nil {
+    //     return nil,err
+    // }
     // Tạo cơ sở dữ liệu nếu nó chưa tồn tại
     _, err = db.Exec("CREATE DATABASE IF NOT EXISTS DB;")
     if err != nil {
@@ -73,8 +77,6 @@ func createDB() (*sql.DB,error) {
     return db,nil
 }
 
-
-
 func main() {
     var db *sql.DB
     var err error
@@ -83,6 +85,9 @@ func main() {
 	}
 
 	a := gin.Default()
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://127.0.0.1:3000/api/homeData"}
+	a.Use(cors.New(config))
 	r := a.Group("/api")
 	r1 := r.Group("/schedule")
 	{
@@ -110,6 +115,7 @@ func main() {
 	{
 		r5.GET("/", home.GetHomeData(db))
 	}
+	r5.Use(cors.New(config))
 	a.Run(":3000")
 
 }
