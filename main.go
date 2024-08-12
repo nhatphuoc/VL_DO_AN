@@ -16,10 +16,10 @@ import (
 
 
 func createDB() (*sql.DB,error) {
-    db, err := sql.Open("mysql", "nhatphuoc:123456789@tcp(localhost:3306)/")
-    if err != nil {
-        return nil,err
-    }
+    db, err := sql.Open("mysql", "gotest:gotest@tcp(db:3306)/db")
+	if err != nil {
+		return nil, err
+	}
 
     // Tạo cơ sở dữ liệu nếu nó chưa tồn tại
     _, err = db.Exec("CREATE DATABASE IF NOT EXISTS DB;")
