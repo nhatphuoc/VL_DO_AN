@@ -1,5 +1,13 @@
 version: '3.8'
 services:
+  comqtt:
+    build:
+      context: comqtt/
+      dockerfile: Dockerfile
+    ports:
+      - "1883:1883"
+      - "1882:1882" 
+      - "8080:8080"
   db:
     build:
       context: .

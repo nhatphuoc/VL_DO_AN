@@ -1,0 +1,3 @@
+[submodule "comqtt"]
+	path = comqtt
+	url = https://github.com/wind-c/comqtt.git
