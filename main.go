@@ -17,27 +17,24 @@ import (
 
 
 func createDB() (*sql.DB,error) {
-    db, err := sql.Open("mysql", "gotest:gotest@tcp(db:3306)/db")
-	if err != nil {
-		return nil, err
-	}
-	// db, err := sql.Open("mysql", "nhatphuoc:123456789@tcp(localhost:3306)/")
-    // if err != nil {
-    //     return nil,err
-    // }
-    // Tạo cơ sở dữ liệu nếu nó chưa tồn tại
+    // db, err := sql.Open("mysql", "gotest:gotest@tcp(db:3306)/db")
+	// if err != nil {
+	// 	return nil, err
+	// }
+	db, err := sql.Open("mysql", "nhatphuoc:123456789@tcp(localhost:3306)/")
+    if err != nil {
+        return nil,err
+    }
     _, err = db.Exec("CREATE DATABASE IF NOT EXISTS DB;")
     if err != nil {
         return nil,err
     }
 
-    // Sử dụng cơ sở dữ liệu vừa tạo
     _, err = db.Exec("USE DB;")
     if err != nil {
         return nil,err
     }
 
-    // Tạo bảng nếu nó chưa tồn tại
     _, err = db.Exec(`CREATE TABLE IF NOT EXISTS Schedule(
         id INT PRIMARY KEY AUTO_INCREMENT,
         feed_value INT NOT NULL,
@@ -86,7 +83,7 @@ func main() {
 
 	a := gin.Default()
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://127.0.0.1:3000/api/homeData"}
+	config.AllowOrigins = []string{"http://127.0.0.1:3000"}
 	a.Use(cors.New(config))
 	r := a.Group("/api")
 	r1 := r.Group("/schedule")
@@ -115,7 +112,6 @@ func main() {
 	{
 		r5.GET("/", home.GetHomeData(db))
 	}
-	r5.Use(cors.New(config))
 	a.Run(":3000")
 
 }
