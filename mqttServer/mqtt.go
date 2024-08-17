@@ -46,20 +46,19 @@ type Dev_Info struct {
 var DeviceInfomation *Dev_Info = nil
 var HomeData Sensor_State
 
-func Received_Dev_Info( payload []byte) error {
+func Received_Dev_Info( payload []byte) {
 	var ss Dev_Info
 	json.Unmarshal(payload, &ss)
 
 	DeviceInfomation = &ss
 
-	return nil
 }
 
 func Reiceve_Sensor_State(payload []byte) {
 	json.Unmarshal(payload, &HomeData)
 }
 
-func Reiceve_image(payload []byte ) error {
+func Reiceve_image(payload []byte ) {
 	currentTime := time.Now()
 	unixTimestamp := currentTime.Unix()
 
@@ -70,12 +69,11 @@ func Reiceve_image(payload []byte ) error {
 	_,err := database.DB.Exec(exec, url, unixTimestamp)
 
 	if err != nil {
-		return err
+		fmt.Println("error:",err)
 	}
-	return nil
 }
 
-func Reiceve_food(payload []byte ) error {
+func Reiceve_food(payload []byte ) {
 	currentTime := time.Now()
 	unixTimestamp := currentTime.Unix()
 
@@ -87,12 +85,11 @@ func Reiceve_food(payload []byte ) error {
 	_,err := database.DB.Exec(exec, ss.Value, unixTimestamp)
 
 	if err != nil {
-		return err
+		fmt.Println("error:",err)
 	}
-	return nil
 }
 
-func Reiceve_water(payload []byte ) error {
+func Reiceve_water(payload []byte ) {
 	currentTime := time.Now()
 	unixTimestamp := currentTime.Unix()
 
@@ -104,12 +101,11 @@ func Reiceve_water(payload []byte ) error {
 	_,err := database.DB.Exec(exec, ss.Value, unixTimestamp)
 
 	if err != nil {
-		return err
+		fmt.Println("error:",err)
 	}
-	return nil
 }
 
-func Reiceve_video(payload []byte ) error {
+func Reiceve_video(payload []byte )  {
 	currentTime := time.Now()
 	unixTimestamp := currentTime.Unix()
 
@@ -120,12 +116,11 @@ func Reiceve_video(payload []byte ) error {
 	_,err := database.DB.Exec(exec, url, unixTimestamp)
 
 	if err != nil {
-		return err
+		fmt.Println("error:",err)
 	}
-	return nil
 }
 
-func Reiceve_log(payload []byte ) error {
+func Reiceve_log(payload []byte )  {
 	currentTime := time.Now()
 	unixTimestamp := currentTime.Unix()
 
@@ -136,16 +131,15 @@ func Reiceve_log(payload []byte ) error {
 	_,err := database.DB.Exec(exec, url, unixTimestamp)
 
 	if err != nil {
-		return err
+		fmt.Println("error:",err)
 	}
-	return nil
 }
 
-func Write_feed_time(client mqtt.Client) error {
+func Write_feed_time(client mqtt.Client)  {
 	query := fmt.Sprintf(`SELECT * from db.%s`, schedule.Schedule{}.TableName())
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		return err
+		fmt.Println("error:",err)
 	}
 	var sche schedule.Schedule
 	var listSche []schedule.Schedule
@@ -154,11 +148,11 @@ func Write_feed_time(client mqtt.Client) error {
 		err = rows.Scan(&sche.ID, &sche.Value, &t, &sche.IsOn)
 		a := strings.Split(t,":")
 		if err != nil {
-			return err
+			fmt.Println("error:",err)
 		}
 		sche.Time, err = time.ParseDuration(a[0]+"h"+a[1]+"m"+a[2]+"s")
 		if err != nil {
-			return err
+			fmt.Println("error:",err)
 		}
 		listSche = append(listSche, sche)
 	}
@@ -173,7 +167,7 @@ func Write_feed_time(client mqtt.Client) error {
 	}
 	token := client.Publish("write_feed_time", 0, false, payload)
     token.Wait()
-	return nil
+
 }
 
 func Write_Feed_Now(client mqtt.Client) error {
@@ -182,15 +176,13 @@ func Write_Feed_Now(client mqtt.Client) error {
 	return nil
 }
 
-func Write_Restart(client mqtt.Client) error {
+func Write_Restart(client mqtt.Client)  {
 	token := client.Publish("restart", 0, false, nil)
     token.Wait()
-	return nil
 }
 
-func Write_Callfunc(client mqtt.Client) error {
+func Write_Callfunc(client mqtt.Client)  {
 	token := client.Publish("call", 0, false, "fake_url")
     token.Wait()
-	return nil
 }
 
