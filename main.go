@@ -61,7 +61,7 @@ func main() {
 		r2.POST("/create", environment.CreateEnvironment(database.DB))
 		r2.POST("/list", environment.ListEnvironment(database.DB))
 	}
-    r3 := r.Group("/gallery")
+    r3 := r.Group("/image")
 	{
 		r3.POST("/create", gallery.CreateGallery(database.DB))
 		r3.POST("/list", gallery.ListGallery(database.DB))
@@ -94,7 +94,7 @@ func main() {
 	{
 		r8.GET("/", func (c*gin.Context){
 			c.JSON(http.StatusOK,gin.H{
-				"url": "fke_url",
+				"url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
 			})
 		})
 	}
