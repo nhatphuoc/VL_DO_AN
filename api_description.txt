@@ -116,6 +116,7 @@ Description: Lấy thông tin chung
     {
         "value": number,               // Lượng thức ăn sẽ cho
         "time": number,                // Thời gian cho ăn (Unix timestamp)
+        "feed_duration": number       // Lượng thức ăn
         "isOn": boolean                // Bật hay tắt lịch này
     }
 
@@ -128,6 +129,7 @@ Description: Lấy thông tin chung
     {
         "value": number,               // Lượng thức ăn sẽ cho
         "time": number,                // Thời gian cho ăn (Unix timestamp)
+        "feed_duration": number       // Lượng thức ăn
         "isOn": boolean                // Bật hay tắt lịch này
     }
 
@@ -147,6 +149,7 @@ Description: Lấy thông tin chung
         "id": number                 //ID
         "value": number,             // Lượng thức ăn sẽ cho
         "time": number,              // Thời gian cho ăn (Unix timestamp)
+        "feed_duration": number       // Lượng thức ăn
         "isOn": boolean              // Bật hay tắt lịch này
       },
       ...

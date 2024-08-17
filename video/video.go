@@ -1,4 +1,4 @@
-package food_drink
+package video
 
 import (
 	"database/sql"
@@ -10,19 +10,19 @@ import (
 )
 
 
-func CreateFoodDrink(db *sql.DB) func(*gin.Context) {
+func CreateVideo(db *sql.DB) func(*gin.Context) {
 	return func(c *gin.Context){
-		var fd Food_Drink
-		if err := c.ShouldBind(&fd); err != nil {
+		var gal Video
+		if err := c.ShouldBind(&gal); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
 
-		exec := fmt.Sprintf(`insert into %s (food,drink,time_taken)
-		value (?,?,?)`, Food_Drink{}.TableName())
-		_,err := db.Exec(exec, fd.Food, fd.Drink, fd.Time)
+		exec := fmt.Sprintf(`insert into %s (url,time_taken)
+		value (?,?)`, Video{}.TableName())
+		_,err := db.Exec(exec, gal.Url, gal.Time)
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -34,7 +34,7 @@ func CreateFoodDrink(db *sql.DB) func(*gin.Context) {
 	}
 }
 
-func ListFoodDrink(db *sql.DB) func(*gin.Context) {
+func ListVideo(db *sql.DB) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var reDate common.Star_End_Day
 
@@ -46,7 +46,7 @@ func ListFoodDrink(db *sql.DB) func(*gin.Context) {
 		}
 
 
-		query := fmt.Sprintf(`SELECT * from %s  where time_taken between %d and %d`, Food_Drink{}.TableName(), reDate.StartDate, reDate.EndDate)
+		query := fmt.Sprintf(`SELECT * from %s  where time_taken between %d and %d`, Video{}.TableName(), reDate.StartDate, reDate.EndDate)
 		rows, err := db.Query(query)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -54,10 +54,10 @@ func ListFoodDrink(db *sql.DB) func(*gin.Context) {
 			})
 			return 
 		}
-		var fd Food_Drink
-		var listFD []Food_Drink
+		var gal Video
+		var listGal []Video
 		for rows.Next() {
-			err = rows.Scan(&fd.Food, &fd.Drink, &fd.Time)
+			err = rows.Scan(&gal.Url, &gal.Time)
 
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{
@@ -65,11 +65,11 @@ func ListFoodDrink(db *sql.DB) func(*gin.Context) {
 				})
 				return 
 			}
-			listFD = append(listFD, fd)
+			listGal = append(listGal, gal)
 		}
 		
 		c.JSON(http.StatusOK,gin.H{
-			"foodDrinkHistory": listFD,
+			"videos": listGal,
 		})
 	}
 }
