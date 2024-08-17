@@ -6,19 +6,23 @@ services:
       dockerfile: Dockerfile
     ports:
       - "1883:1883"
-      - "1882:1882" 
+      - "1882:1882"
       - "8080:8080"
   db:
     build:
       context: .
       dockerfile: docker/db/Dockerfile
+    ulimits:
+      nofile: # Fix memory leak issue on some systems when LimitCORE=infinity (containerd)
+        soft: 64000
+        hard: 64000
     environment:
       MYSQL_USER: gotest
       MYSQL_PASSWORD: gotest
       MYSQL_ROOT_PASSWORD: gotest
       MYSQL_DATABASE: db
     volumes:
-      - ../../../../_local_mysql_data:/var/lib/mysql
+      - db:/var/lib/mysql
   web:
     build:
       context: .
@@ -27,6 +31,9 @@ services:
       - "3000:3000"
     links:
       - db
-    volumes:
-     - ../../../../.:/go
-  
+      - comqtt
+volumes:
+  db:
+    driver: local
+networks:
+  shared:

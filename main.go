@@ -21,14 +21,16 @@ import (
 
 
 func main() {
+    var err error
+	if database.DB,err = database.CreateDB(); err != nil {
+		fmt.Println(err.Error())
+	}
 
-	var broker = "localhost"
+	var broker = "comqtt"
     var port = 1883
     opts := mqtt.NewClientOptions()
     opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
     opts.SetClientID("go_mqtt_client")
-    opts.SetUsername("emqx")
-    opts.SetPassword("public")
     opts.SetDefaultPublishHandler(mqttServer.MessagePubHandler)
     opts.OnConnect = mqttServer.ConnectHandler
     opts.OnConnectionLost = mqttServer.ConnectLostHandler
@@ -39,14 +41,12 @@ func main() {
 	mqttServer.Sub(client)
 
     //client.Disconnect(250)
-    
-    var err error
-	if database.DB,err = database.CreateDB(); err != nil {
-		fmt.Println(err.Error())
-	}
+
+
 
 	a := gin.Default()
-	a.Use(static.Serve("/", static.LocalFile("/tmp", false)))
+
+	a.Use(static.Serve("/", static.LocalFile("./static", true)))
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://127.0.0.1:3000"}
 	a.Use(cors.New(config))
@@ -85,12 +85,12 @@ func main() {
 		r7.GET("/",func (c*gin.Context){
 			token := client.Publish("get_dev_info", 0, false, nil)
 			token.Wait()
-			for mqttServer.DeviceInfomation == nil {				
+			for mqttServer.DeviceInfomation == nil {
 			}
 			c.JSON(http.StatusOK,mqttServer.DeviceInfomation)
 			mqttServer.DeviceInfomation = nil
 		})
-			
+
 	}
 	r8 := r.Group("/camera")
 	{
