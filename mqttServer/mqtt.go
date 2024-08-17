@@ -170,10 +170,9 @@ func Write_feed_time(client mqtt.Client)  {
 
 }
 
-func Write_Feed_Now(client mqtt.Client) error {
+func Write_Feed_Now(client mqtt.Client)  {
 	token := client.Publish("feed_now", 0, false, 1)
     token.Wait()
-	return nil
 }
 
 func Write_Restart(client mqtt.Client)  {
