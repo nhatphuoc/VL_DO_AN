@@ -14,6 +14,7 @@ import (
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -45,6 +46,7 @@ func main() {
 	}
 
 	a := gin.Default()
+	a.Use(static.Serve("/", static.LocalFile("/tmp", false)))
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://127.0.0.1:3000"}
 	a.Use(cors.New(config))
