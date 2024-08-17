@@ -22,7 +22,7 @@ func Sub(client mqtt.Client){
 		token := client.Subscribe(topic, 1, nil)
 		token.Wait()
 		fmt.Printf("Subscribed to topic: %s", topic)
-	} 
+	}
 }
 
 type Sensor_State struct {
@@ -51,7 +51,6 @@ func Received_Dev_Info( payload []byte) {
 	json.Unmarshal(payload, &ss)
 
 	DeviceInfomation = &ss
-
 }
 
 func Reiceve_Sensor_State(payload []byte) {
@@ -69,7 +68,7 @@ func Reiceve_image(payload []byte ) {
 	_,err := database.DB.Exec(exec, url, unixTimestamp)
 
 	if err != nil {
-		fmt.Println("error:",err)
+		fmt.Println("Receive_image error:",err)
 	}
 }
 
@@ -85,7 +84,7 @@ func Reiceve_food(payload []byte ) {
 	_,err := database.DB.Exec(exec, ss.Value, unixTimestamp)
 
 	if err != nil {
-		fmt.Println("error:",err)
+		fmt.Println("Receive_food error:",err)
 	}
 }
 
@@ -101,7 +100,7 @@ func Reiceve_water(payload []byte ) {
 	_,err := database.DB.Exec(exec, ss.Value, unixTimestamp)
 
 	if err != nil {
-		fmt.Println("error:",err)
+		fmt.Println("Reiceve_water error:",err)
 	}
 }
 
@@ -116,7 +115,7 @@ func Reiceve_video(payload []byte )  {
 	_,err := database.DB.Exec(exec, url, unixTimestamp)
 
 	if err != nil {
-		fmt.Println("error:",err)
+		fmt.Println("Reiceve_video error:",err)
 	}
 }
 
@@ -131,7 +130,7 @@ func Reiceve_log(payload []byte )  {
 	_,err := database.DB.Exec(exec, url, unixTimestamp)
 
 	if err != nil {
-		fmt.Println("error:",err)
+		fmt.Println("Reiceve_log error:",err)
 	}
 }
 
@@ -139,7 +138,7 @@ func Write_feed_time(client mqtt.Client)  {
 	query := fmt.Sprintf(`SELECT * from db.%s`, schedule.Schedule{}.TableName())
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println("error:",err)
+		fmt.Println("Write_feed_time error:",err)
 	}
 	var sche schedule.Schedule
 	var listSche []schedule.Schedule
@@ -148,11 +147,11 @@ func Write_feed_time(client mqtt.Client)  {
 		err = rows.Scan(&sche.ID, &sche.Value, &t, &sche.IsOn)
 		a := strings.Split(t,":")
 		if err != nil {
-			fmt.Println("error:",err)
+			fmt.Println("Write_feed_time error:",err)
 		}
 		sche.Time, err = time.ParseDuration(a[0]+"h"+a[1]+"m"+a[2]+"s")
 		if err != nil {
-			fmt.Println("error:",err)
+			fmt.Println("Write_feed_time error:",err)
 		}
 		listSche = append(listSche, sche)
 	}
@@ -163,7 +162,7 @@ func Write_feed_time(client mqtt.Client)  {
 		minutes := (schedu.Time % time.Hour) / time.Minute
 		if bool(v) {
 			payload += fmt.Sprintf("{%d %d fake_url %d %d}",hours, minutes, schedu.Value, sche.Feed_Duration)
-		}	
+		}
 	}
 	token := client.Publish("write_feed_time", 0, false, payload)
     token.Wait()

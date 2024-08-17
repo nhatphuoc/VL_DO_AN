@@ -7,6 +7,7 @@ import (
 )
 
 var MessagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
+    fmt.Printf("%+v\n", msg)
     switch msg.Topic() {
         case "device_state":
             Reiceve_Sensor_State(msg.Payload())

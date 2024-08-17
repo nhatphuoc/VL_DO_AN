@@ -1,29 +1,31 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"os"
+	"fmt"
+)
 
 var DB *sql.DB
 
 func CreateDB() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "gotest:gotest@tcp(db:3306)/db")
+	print("Connecting to db")
+    dbUser := os.Getenv("MYSQL_USER")
+    dbPassword := os.Getenv("MYSQL_PASSWORD")
+    dbName := os.Getenv("MYSQL_DATABASE")
+
+    dsn := fmt.Sprintf("%s:%s@tcp(db:3306)/%s", dbUser, dbPassword, dbName)
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
 	}
+	print("Done connecting to db")
 	// db, err := sql.Open("mysql", "nhatphuoc:123456789@tcp(localhost:3306)/")
 	// if err != nil {
 	//     return nil,err
 	// }
-	_, err = db.Exec("CREATE DATABASE IF NOT EXISTS DB;")
-	if err != nil {
-		return nil, err
-	}
 
-	_, err = db.Exec("USE DB;")
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS Schedule(
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS schedule(
         id INT PRIMARY KEY AUTO_INCREMENT,
         feed_value INT NOT NULL,
         feed_time TIME NOT NULL,
@@ -33,7 +35,7 @@ func CreateDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	_, err = db.Exec(`create table IF NOT EXISTS Environment(
+	_, err = db.Exec(`create table IF NOT EXISTS environment(
 		temperature int not null,
 		humidity int not null,
 		time_taken int UNSIGNED not null
@@ -42,7 +44,7 @@ func CreateDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	_, err = db.Exec(`create table IF NOT EXISTS Log(
+	_, err = db.Exec(`create table IF NOT EXISTS log(
 		url longtext not null,
 		time_taken int UNSIGNED not null
 	);`)
@@ -50,7 +52,7 @@ func CreateDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	_, err = db.Exec(`create table IF NOT EXISTS Gallery(
+	_, err = db.Exec(`create table IF NOT EXISTS gallery(
 		url longtext not null,
 		time_taken int UNSIGNED not null
 	);`)
@@ -59,7 +61,7 @@ func CreateDB() (*sql.DB, error) {
 	}
 
 
-	_, err = db.Exec(`create table IF NOT EXISTS Video(
+	_, err = db.Exec(`create table IF NOT EXISTS video(
 		url longtext not null,
 		time_taken int UNSIGNED not null
 	);`)
@@ -67,7 +69,7 @@ func CreateDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	_, err = db.Exec(`create table IF NOT EXISTS Food(
+	_, err = db.Exec(`create table IF NOT EXISTS food(
 		food int not null,
 		time_taken int UNSIGNED not null
 	);`)
@@ -75,7 +77,7 @@ func CreateDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	_, err = db.Exec(`create table IF NOT EXISTS Water(
+	_, err = db.Exec(`create table IF NOT EXISTS water(
 		water int not null,
 		time_taken int UNSIGNED not null
 	);`)
