@@ -22,9 +22,9 @@ func CreateSchedule(db *sql.DB) func(*gin.Context) {
 			return
 		}
 
-		exec := fmt.Sprintf(`insert into %s (feed_value,feed_time,feed_duration,isOn)
-		values (?,?,?,?)`, Schedule{}.TableName())
-		_, err := db.Exec(exec, sche.Value, sche.Time, sche.Feed_Duration, sche.IsOn)
+		exec := fmt.Sprintf(`insert into %s (feed_value,feed_time,feed_duration,url,isOn)
+		values (?,?,?,?,?)`, Schedule{}.TableName())
+		_, err := db.Exec(exec, sche.Value, sche.Time, sche.Feed_Duration, sche.Url, sche.IsOn)
 
 		if err != nil {
 			println("Err 32")
@@ -59,9 +59,10 @@ func UpdateSchedule(db *sql.DB) func(*gin.Context) {
 			return
 		}
 
-		exec := fmt.Sprintf(`update %s
-		set feed_value=%d,feed_time=%d,feed_duration=%d,isOn=%t
-		where id = %d`, Schedule{}.TableName(), sche.Value, sche.Time, sche.Feed_Duration, sche.IsOn, id)
+		exec := fmt.Sprintf(`UPDATE %s
+		SET feed_value=%d, feed_time=%d, feed_duration=%d, url='%s', isOn=%t
+		WHERE id = %d`, 
+		Schedule{}.TableName(), sche.Value, sche.Time, sche.Feed_Duration, sche.Url, sche.IsOn, id)
 		_, err = db.Exec(exec)
 
 		if err != nil {
@@ -115,7 +116,7 @@ func ListSchedule(db *sql.DB) func(*gin.Context) {
 		var sche Schedule
 		listSche := make([]Schedule, 0)
 		for rows.Next() {
-			err = rows.Scan(&sche.ID, &sche.Value, &sche.Time, &sche.Feed_Duration, &sche.IsOn)
+			err = rows.Scan(&sche.ID, &sche.Value, &sche.Time, &sche.Feed_Duration, &sche.Url, &sche.IsOn)
 			sche.Time = sche.Time[:5]
 			sche.Time = sche.Time[:2] + sche.Time[3:]
 
@@ -140,5 +141,5 @@ func ListSchedule(db *sql.DB) func(*gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"schedule": listSche,
 		})
-	}
+}
 }

@@ -30,6 +30,7 @@ func CreateDB() (*sql.DB, error) {
         feed_value INT NOT NULL,
         feed_time TIME NOT NULL,
 		feed_duration INT NOT NULL,
+		url longtext not null,
         isOn BOOL
     );`)
 	if err != nil {
