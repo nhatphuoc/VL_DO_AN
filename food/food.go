@@ -9,6 +9,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func CreateFood(db *sql.DB) func(*gin.Context) {
+	return func(c *gin.Context){
+		var env Food
+		if err := c.ShouldBind(&env); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		exec := fmt.Sprintf(`insert into %s (value,time_taken)
+		value (?,?)`, Food{}.TableName())
+		_,err := db.Exec(exec, env.Value, env.Time)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusOK,true)
+	}
+}
+
 
 func ListFood(db *sql.DB) func(*gin.Context) {
 	return func(c *gin.Context) {

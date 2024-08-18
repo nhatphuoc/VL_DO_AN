@@ -44,14 +44,14 @@ type Dev_Info struct {
 	Wifi     string `json:"wifi"`
 }
 
+var DevInfo Dev_Info
 var DeviceInfomation *Dev_Info = nil
 var HomeData Sensor_State
 
 func Received_Dev_Info(payload []byte) {
-	var ss Dev_Info
-	json.Unmarshal(payload, &ss)
+	json.Unmarshal(payload, &DevInfo)
 
-	DeviceInfomation = &ss
+	DeviceInfomation = &DevInfo
 }
 
 func Reiceve_Sensor_State(payload []byte) {

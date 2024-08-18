@@ -26,7 +26,7 @@ func GetHomeData(db *sql.DB) func(*gin.Context) {
 		var sche schedule.Schedule
 		var listSche []schedule.Schedule
 		for rows.Next() {
-			err = rows.Scan(&sche.ID, &sche.Value, &sche.Time, &sche.Feed_Duration, &sche.IsOn)
+			err = rows.Scan(&sche.ID, &sche.Value, &sche.Time, &sche.Feed_Duration, &sche.Url, &sche.IsOn)
 
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{
@@ -67,12 +67,14 @@ func GetHomeData(db *sql.DB) func(*gin.Context) {
 				"temp":  mqttServer.HomeData.Temperature,
 				"humid": mqttServer.HomeData.Humidity,
 				"nextFeed": gin.H{
-					"value": "Not set",
-					"time":  "Not set",
+					"value":         -1,
+					"time":          "null",
+					"feed_duration": -1,
 				},
 				"prevFeed": gin.H{
-					"value": "Not set",
-					"time":  "Not set",
+					"value":         -1,
+					"time":          "null",
+					"feed_duration": -1,
 				},
 				"lastImg": gal,
 			})
@@ -101,6 +103,12 @@ func GetHomeData(db *sql.DB) func(*gin.Context) {
 					next = schedule
 				}
 			}
+
+			next.Time = next.Time[:5]
+			next.Time = next.Time[:2] + next.Time[3:]
+
+			previous.Time = previous.Time[:5]
+			previous.Time = previous.Time[:2] + previous.Time[3:]
 
 			c.JSON(http.StatusOK, gin.H{
 				"food":  mqttServer.HomeData.Food,

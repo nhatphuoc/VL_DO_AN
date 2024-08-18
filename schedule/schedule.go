@@ -60,7 +60,7 @@ func UpdateSchedule(db *sql.DB) func(*gin.Context) {
 		}
 
 		exec := fmt.Sprintf(`UPDATE %s
-		SET feed_value=%d, feed_time=%d, feed_duration=%d, url='%s', isOn=%t
+		SET feed_value=%d, feed_time='%s', feed_duration=%d, url='%s', isOn=%t
 		WHERE id = %d`, 
 		Schedule{}.TableName(), sche.Value, sche.Time, sche.Feed_Duration, sche.Url, sche.IsOn, id)
 		_, err = db.Exec(exec)

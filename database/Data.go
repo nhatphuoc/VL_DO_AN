@@ -2,20 +2,30 @@ package database
 
 import (
 	"database/sql"
-	"os"
 	"fmt"
+	"os"
 )
 
 var DB *sql.DB
 
 func CreateDB() (*sql.DB, error) {
-	print("Connecting to db")
-    dbUser := os.Getenv("MYSQL_USER")
+	dbUser := os.Getenv("MYSQL_USER")
     dbPassword := os.Getenv("MYSQL_PASSWORD")
     dbName := os.Getenv("MYSQL_DATABASE")
-
-    dsn := fmt.Sprintf("%s:%s@tcp(db:3306)/%s", dbUser, dbPassword, dbName)
+	dsn := fmt.Sprintf("%s:%s@tcp(db:3306)/", dbUser, dbPassword)
 	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dbName))
+	if err != nil {
+		return nil, err
+	}
+	
+    dsnWithDB := fmt.Sprintf("%s:%s@tcp(db:3306)/%s", dbUser, dbPassword, dbName)
+	db, err = sql.Open("mysql", dsnWithDB)
 	if err != nil {
 		return nil, err
 	}
