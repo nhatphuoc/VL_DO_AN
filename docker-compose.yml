@@ -30,7 +30,7 @@ services:
       <<: *db_env
     ports:
       - "3000:3000"
-    entrypoint: ["sh", "-c", "sleep 10 && go run main.go"]
+    entrypoint: ["sh", "-c", "go install github.com/air-verse/air@latest && sleep 5 && air"]
     links:
       - db
       - comqtt

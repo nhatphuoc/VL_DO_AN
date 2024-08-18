@@ -21,7 +21,7 @@ func CreateEnvironment(db *sql.DB) func(*gin.Context) {
 		}
 
 		exec := fmt.Sprintf(`insert into %s (temperature,humidity,time_taken)
-		value (?,?,?)`, Enviroment{}.TableName())
+		values (?,?,?)`, Enviroment{}.TableName())
 		_,err := db.Exec(exec, env.Temperature, env.Humidity, env.Time)
 
 		if err != nil {
@@ -42,7 +42,7 @@ func ListEnvironment(db *sql.DB) func(*gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
-			return 
+			return
 		}
 
 
@@ -52,7 +52,7 @@ func ListEnvironment(db *sql.DB) func(*gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
-			return 
+			return
 		}
 		var env Enviroment
 		var listEnv []Enviroment
@@ -63,11 +63,11 @@ func ListEnvironment(db *sql.DB) func(*gin.Context) {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"error": err.Error(),
 				})
-				return 
+				return
 			}
 			listEnv = append(listEnv, env)
 		}
-		
+
 		c.JSON(http.StatusOK,gin.H{
 			"environmentHistory": listEnv,
 		})

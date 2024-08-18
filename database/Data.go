@@ -29,6 +29,7 @@ func CreateDB() (*sql.DB, error) {
         id INT PRIMARY KEY AUTO_INCREMENT,
         feed_value INT NOT NULL,
         feed_time TIME NOT NULL,
+		feed_duration INT NOT NULL,
         isOn BOOL
     );`)
 	if err != nil {

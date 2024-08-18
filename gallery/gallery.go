@@ -21,7 +21,7 @@ func CreateGallery(db *sql.DB) func(*gin.Context) {
 		}
 
 		exec := fmt.Sprintf(`insert into %s (url,time_taken)
-		value (?,?)`, Gallery{}.TableName())
+		values (?,?)`, Gallery{}.TableName())
 		_,err := db.Exec(exec, gal.Url, gal.Time)
 
 		if err != nil {
@@ -42,7 +42,7 @@ func ListGallery(db *sql.DB) func(*gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
-			return 
+			return
 		}
 
 
@@ -52,7 +52,7 @@ func ListGallery(db *sql.DB) func(*gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
-			return 
+			return
 		}
 		var gal Gallery
 		var listGal []Gallery
@@ -63,11 +63,11 @@ func ListGallery(db *sql.DB) func(*gin.Context) {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"error": err.Error(),
 				})
-				return 
+				return
 			}
 			listGal = append(listGal, gal)
 		}
-		
+
 		c.JSON(http.StatusOK,gin.H{
 			"images": listGal,
 		})

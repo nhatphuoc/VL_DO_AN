@@ -7,9 +7,9 @@ import (
 )
 
 var MessagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-    fmt.Printf("%+v\n", msg)
+    fmt.Printf("Received MQTT Message with Topic: %s\n", msg.Topic());
     switch msg.Topic() {
-        case "device_state":
+        case "sensor_state":
             Reiceve_Sensor_State(msg.Payload())
         case "add_image":
             Reiceve_image(msg.Payload())

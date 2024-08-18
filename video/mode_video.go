@@ -1,7 +1,7 @@
 package video
 
 type Video struct {
-	Url  string `json" sql:"url"`
+	Url  string `json:"url" sql:"url"`
 	Time uint64 `json:"time" sql:"time_taken"`
 }
 

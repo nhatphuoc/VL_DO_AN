@@ -42,44 +42,47 @@ func main() {
 
     //client.Disconnect(250)
 
-
-
 	a := gin.Default()
-
+	a.Use(cors.Default())
 	a.Use(static.Serve("/", static.LocalFile("./static", true)))
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://127.0.0.1:3000"}
-	a.Use(cors.New(config))
+
 	r := a.Group("/api")
+
 	r1 := r.Group("/schedule")
 	{
-		r1.POST("", schedule.CreateSchedule(database.DB))
+		r1.POST("/", schedule.CreateSchedule(database.DB))
         r1.PATCH(":id", schedule.UpdateSchedule(database.DB))
-		r1.GET("", schedule.ListSchedule(database.DB))
+		r1.GET("/", schedule.ListSchedule(database.DB))
 		r1.DELETE(":id", schedule.DeleteSchedule(database.DB))
 	}
+
     r2 := r.Group("/environment")
 	{
 		r2.POST("/create", environment.CreateEnvironment(database.DB))
 		r2.POST("/list", environment.ListEnvironment(database.DB))
 	}
+
     r3 := r.Group("/image")
 	{
-		r3.POST("/create", gallery.CreateGallery(database.DB))
-		r3.POST("/list", gallery.ListGallery(database.DB))
+		r3.POST("/", gallery.CreateGallery(database.DB))
+		r3.GET("/", gallery.ListGallery(database.DB))
 	}
+
 	r4 := r.Group("/homeData")
 	{
 		r4.GET("/", home.GetHomeData(database.DB))
 	}
+
 	r5 := r.Group("/video")
 	{
-		r5.POST("/list", video.ListVideo(database.DB))
+		r5.POST("/", video.ListVideo(database.DB))
 	}
+
 	r6 := r.Group("/log")
 	{
-		r6.POST("/list", log.ListLog(database.DB))
+		r6.POST("/", log.ListLog(database.DB))
 	}
+
 	r7 := r.Group("/status")
 	{
 		r7.GET("/",func (c*gin.Context){
@@ -90,8 +93,8 @@ func main() {
 			c.JSON(http.StatusOK,mqttServer.DeviceInfomation)
 			mqttServer.DeviceInfomation = nil
 		})
-
 	}
+
 	r8 := r.Group("/camera")
 	{
 		r8.GET("/", func (c*gin.Context){
@@ -100,6 +103,7 @@ func main() {
 			})
 		})
 	}
+
 	r9 := r.Group("/feedNow")
 	{
 		r9.POST("/", func (c*gin.Context){
@@ -107,6 +111,7 @@ func main() {
 			c.JSON(http.StatusOK,true)
 		})
 	}
+
 	r10 := r.Group("/restart")
 	{
 		r10.POST("/", func (c*gin.Context){
@@ -115,7 +120,15 @@ func main() {
 		})
 	}
 
-
+	r11 := r.Group("/call")
+	{
+		r11.GET("/", func (c*gin.Context){
+			mqttServer.Write_Callfunc(client)
+			c.JSON(http.StatusOK,gin.H{
+				"url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+			})
+		})
+	}
 
 
 	a.Run(":3000")
