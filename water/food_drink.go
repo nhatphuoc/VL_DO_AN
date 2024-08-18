@@ -45,7 +45,7 @@ func ListWater(db *sql.DB) func(*gin.Context) {
 		}
 		
 		c.JSON(http.StatusOK,gin.H{
-			"foodDrinkHistory": listFD,
+			"waterList": listFD,
 		})
 	}
 }
