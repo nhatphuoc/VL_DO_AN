@@ -9,9 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 func CreateEnvironment(db *sql.DB) func(*gin.Context) {
-	return func(c *gin.Context){
+	return func(c *gin.Context) {
 		var env Enviroment
 		if err := c.ShouldBind(&env); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -22,7 +21,7 @@ func CreateEnvironment(db *sql.DB) func(*gin.Context) {
 
 		exec := fmt.Sprintf(`insert into %s (temperature,humidity,time_taken)
 		values (?,?,?)`, Enviroment{}.TableName())
-		_,err := db.Exec(exec, env.Temperature, env.Humidity, env.Time)
+		_, err := db.Exec(exec, env.Temperature, env.Humidity, env.Time)
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -30,7 +29,7 @@ func CreateEnvironment(db *sql.DB) func(*gin.Context) {
 			})
 			return
 		}
-		c.JSON(http.StatusOK,true)
+		c.JSON(http.StatusOK, true)
 	}
 }
 
@@ -45,7 +44,6 @@ func ListEnvironment(db *sql.DB) func(*gin.Context) {
 			return
 		}
 
-
 		query := fmt.Sprintf(`SELECT * from %s  where time_taken between %d and %d`, Enviroment{}.TableName(), reDate.StartDate, reDate.EndDate)
 		rows, err := db.Query(query)
 		if err != nil {
@@ -55,7 +53,7 @@ func ListEnvironment(db *sql.DB) func(*gin.Context) {
 			return
 		}
 		var env Enviroment
-		var listEnv []Enviroment
+		listEnv := make([]Enviroment, 0)
 		for rows.Next() {
 			err = rows.Scan(&env.Temperature, &env.Humidity, &env.Time)
 
@@ -68,7 +66,7 @@ func ListEnvironment(db *sql.DB) func(*gin.Context) {
 			listEnv = append(listEnv, env)
 		}
 
-		c.JSON(http.StatusOK,gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"environmentHistory": listEnv,
 		})
 	}
