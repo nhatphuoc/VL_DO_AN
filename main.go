@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"go-module/database"
 	"go-module/environment"
+	"go-module/food"
 	"go-module/gallery"
 	"go-module/home-data"
 	"go-module/log"
 	"go-module/mqttServer"
 	"go-module/schedule"
 	"go-module/video"
+	"go-module/water"
 	"net/http"
 	"time"
 
@@ -128,6 +130,16 @@ func main() {
 				"url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
 			})
 		})
+	}
+
+	r12 := r.Group("/water")
+	{
+		r12.POST("/", water.ListWater(database.DB))
+	}
+
+	r13 := r.Group("/food")
+	{
+		r13.POST("/", food.ListFood(database.DB))
 	}
 
 	a.Run(":3000")
