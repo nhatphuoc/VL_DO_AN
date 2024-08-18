@@ -4,14 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func ListLog(db *sql.DB) func(*gin.Context) {
 	return func(c *gin.Context) {
-		query := fmt.Sprintf(`SELECT * from %s`, Log{}.TableName())
+		query := fmt.Sprintf(`SELECT * from %s ORDER BY time_taken DESC LIMIT 100`, Log{}.TableName())
 		rows, err := db.Query(query)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -30,10 +29,7 @@ func ListLog(db *sql.DB) func(*gin.Context) {
 				})
 				return
 			}
-			timestamp := time.Unix(int64(gal.Time), 0)
-			a := fmt.Sprintf("%v", timestamp)
-			str := a + ": " + gal.Url
-			listGal = append(listGal,str)
+			listGal = append(listGal, gal.Url)
 		}
 
 		c.JSON(http.StatusOK, gin.H{

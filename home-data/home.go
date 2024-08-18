@@ -109,11 +109,11 @@ func GetHomeData(db *sql.DB) func(*gin.Context) {
 				"humid": mqttServer.HomeData.Humidity,
 				"nextFeed": gin.H{
 					"value": next.Value,
-					"time":  next.Time,
+					"time":  next.Time[:2] + next.Time[3:5],
 				},
 				"prevFeed": gin.H{
 					"value": previous.Value,
-					"time":  previous.Time,
+					"time":  previous.Time[:2] + previous.Time[3:5],
 				},
 				"lastImg": gal,
 			})

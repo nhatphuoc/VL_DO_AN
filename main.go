@@ -40,7 +40,12 @@ func main() {
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
-	mqttServer.Sub(client)
+	go func() {
+		mqttServer.Sub(client)
+		for range time.Tick(time.Hour) {
+			mqttServer.Sub(client)
+		}
+	}()
 
 	//client.Disconnect(250)
 
@@ -81,19 +86,13 @@ func main() {
 
 	r6 := r.Group("/log")
 	{
-		r6.POST("/", log.ListLog(database.DB))
+		r6.GET("/", log.ListLog(database.DB))
 	}
 
 	r7 := r.Group("/status")
 	{
 		r7.GET("/", func(c *gin.Context) {
-			token := client.Publish("get_dev_info", 2, false, "1")
-			token.Wait()
-			for mqttServer.DeviceInfomation == nil {
-				time.Sleep(1)
-			}
 			c.JSON(http.StatusOK, mqttServer.DeviceInfomation)
-			mqttServer.DeviceInfomation = nil
 		})
 	}
 

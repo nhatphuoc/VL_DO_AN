@@ -22,7 +22,7 @@ func Sub(client mqtt.Client) {
 	for _, topic := range topics {
 		token := client.Subscribe(topic, 1, nil)
 		token.Wait()
-		fmt.Printf("Subscribed to topic: %s", topic)
+		fmt.Printf("Subscribed to topic: %s\n", topic)
 	}
 }
 
