@@ -115,8 +115,9 @@ func ListSchedule(db *sql.DB) func(*gin.Context) {
 		var sche Schedule
 		listSche := make([]Schedule, 0)
 		for rows.Next() {
-			var tmp int
-			err = rows.Scan(&tmp, &sche.Value, &sche.Time, &sche.Feed_Duration, &sche.IsOn)
+			err = rows.Scan(&sche.ID, &sche.Value, &sche.Time, &sche.Feed_Duration, &sche.IsOn)
+			sche.Time = sche.Time[:5]
+			sche.Time = sche.Time[:2] + sche.Time[3:]
 
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{

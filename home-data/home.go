@@ -14,7 +14,7 @@ import (
 
 func GetHomeData(db *sql.DB) func(*gin.Context) {
 	return func(c *gin.Context) {
-		query := fmt.Sprintf(`SELECT * from %s ORDER BY feed_time DESC WHERE isOn = 1`, schedule.Schedule{}.TableName())
+		query := fmt.Sprintf(`SELECT * from %s WHERE isOn = 1 ORDER BY feed_time DESC`, schedule.Schedule{}.TableName())
 		rows, err := db.Query(query)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
