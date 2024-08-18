@@ -10,6 +10,8 @@ import (
 	"go-module/mqttServer"
 	"go-module/schedule"
 	"go-module/video"
+	"go-module/water"
+	"go-module/food"
 	"net/http"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -128,6 +130,16 @@ func main() {
 				"url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
 			})
 		})
+	}
+
+	r12 := r.Group("/water")
+	{
+		r12.POST("/", water.ListWater(database.DB))
+	}
+
+	r13 := r.Group("/food")
+	{
+		r13.POST("/", food.ListFood(database.DB))
 	}
 
 
