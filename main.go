@@ -53,19 +53,19 @@ func main() {
 	r1 := r.Group("/schedule")
 	{
 		r1.POST("/", schedule.CreateSchedule(database.DB))
-		r1.PATCH(":id", schedule.UpdateSchedule(database.DB))
+		r1.POST("/:id", schedule.UpdateSchedule(database.DB))
 		r1.GET("/", schedule.ListSchedule(database.DB))
-		r1.DELETE(":id", schedule.DeleteSchedule(database.DB))
+		r1.DELETE("/:id", schedule.DeleteSchedule(database.DB))
 	}
 	r2 := r.Group("/environment")
 	{
-		r2.POST("/create", environment.CreateEnvironment(database.DB))
+		// r2.POST("/create", environment.CreateEnvironment(database.DB))
 		r2.POST("/", environment.ListEnvironment(database.DB))
 	}
 
 	r3 := r.Group("/image")
 	{
-		r3.POST("/", gallery.CreateGallery(database.DB))
+		// r3.POST("/", gallery.CreateGallery(database.DB))
 		r3.GET("/", gallery.ListGallery(database.DB))
 	}
 
@@ -76,12 +76,12 @@ func main() {
 
 	r5 := r.Group("/video")
 	{
-		r5.POST("/", video.ListVideo(database.DB))
+		r5.GET("/", video.ListVideo(database.DB))
 	}
 
 	r6 := r.Group("/log")
 	{
-		r6.POST("/", log.ListLog(database.DB))
+		r6.GET("/", log.ListLog(database.DB))
 	}
 
 	r7 := r.Group("/status")
