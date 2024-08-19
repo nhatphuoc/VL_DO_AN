@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-module/database"
+	"go-module/environment"
 	"go-module/food"
 	"go-module/gallery"
 	"go-module/log"
@@ -22,13 +23,13 @@ func Sub(client mqtt.Client) {
 	for _, topic := range topics {
 		token := client.Subscribe(topic, 1, nil)
 		token.Wait()
-		fmt.Printf("Subscribed to topic: %s\n", topic)
+		fmt.Printf("Subscribed to topic: %s", topic)
 	}
 }
 
 type Sensor_State struct {
-	Temperature int `json:"temp" `
-	Humidity    int `json:"humid" `
+	Temperature float64 `json:"temp" `
+	Humidity    float64 `json:"humid" `
 	Food        int `json:"food" `
 	Water       int `json:"water" `
 }
@@ -56,6 +57,16 @@ func Received_Dev_Info(payload []byte) {
 
 func Reiceve_Sensor_State(payload []byte) {
 	json.Unmarshal(payload, &HomeData)
+	nowsub := time.Now()
+	now := nowsub.Unix()
+	exec := fmt.Sprintf(`insert into %s (temperature,humidity,time_taken)
+	values (?,?,?)`, environment.Environment{}.TableName())
+	_, err := database.DB.Exec(exec, HomeData.Temperature, HomeData.Humidity, now)
+
+	if err != nil {
+		fmt.Println("Reiceve_Sensor_State error:", err)
+
+	}
 }
 
 func Reiceve_image(payload []byte) {

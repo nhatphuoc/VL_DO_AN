@@ -48,8 +48,8 @@ func CreateDB() (*sql.DB, error) {
 	}
 
 	_, err = db.Exec(`create table IF NOT EXISTS environment(
-		temperature int not null,
-		humidity int not null,
+		temperature double not null,
+		humidity double not null,
 		time_taken int UNSIGNED not null
 	);`)
 	if err != nil {
@@ -82,7 +82,7 @@ func CreateDB() (*sql.DB, error) {
 	}
 
 	_, err = db.Exec(`create table IF NOT EXISTS food(
-		food int not null,
+		food double not null,
 		time_taken int UNSIGNED not null
 	);`)
 	if err != nil {
@@ -90,7 +90,7 @@ func CreateDB() (*sql.DB, error) {
 	}
 
 	_, err = db.Exec(`create table IF NOT EXISTS water(
-		water int not null,
+		water double not null,
 		time_taken int UNSIGNED not null
 	);`)
 	if err != nil {
