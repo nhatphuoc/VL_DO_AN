@@ -1,7 +1,7 @@
 package water
 
 type Water struct {
-	Value float64 `json:"value" sql:"value"`
+	Value float64 `json:"value" sql:"water"`
 	Time  uint64  `json:"time" sql:"time_taken"`
 }
 

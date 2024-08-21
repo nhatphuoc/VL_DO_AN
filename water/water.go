@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 func ListWater(db *sql.DB) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var reDate common.Star_End_Day
@@ -20,9 +19,8 @@ func ListWater(db *sql.DB) func(*gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
-			return 
+			return
 		}
-
 
 		query := fmt.Sprintf(`SELECT * from %s  where time_taken between %d and %d`, Water{}.TableName(), reDate.StartDate, reDate.EndDate)
 		rows, err := db.Query(query)
@@ -30,10 +28,10 @@ func ListWater(db *sql.DB) func(*gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
-			return 
+			return
 		}
 		var fd Water
-		var listFD []Water
+		listFD := make([]Water, 0)
 		for rows.Next() {
 			err = rows.Scan(&fd.Value, &fd.Time)
 
@@ -41,12 +39,12 @@ func ListWater(db *sql.DB) func(*gin.Context) {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"error": err.Error(),
 				})
-				return 
+				return
 			}
 			listFD = append(listFD, fd)
 		}
 		sub := make([]Water, 0)
-		for _,Water1 := range listFD {
+		for _, Water1 := range listFD {
 			timeStamp := time.Unix(int64(Water1.Time), 0)
 			startOfDay := time.Date(timeStamp.Year(), timeStamp.Month(), timeStamp.Day(), 0, 0, 0, 0, timeStamp.Location())
 			startOfDayUnix := startOfDay.Unix()
@@ -59,7 +57,7 @@ func ListWater(db *sql.DB) func(*gin.Context) {
 			groupedData[d.Time] = append(groupedData[d.Time], d)
 		}
 
-		var re []Water
+		re := make([]Water, 0)
 		for timestamp, water2 := range groupedData {
 			var sumValue float64
 			for _, water3 := range water2 {
@@ -68,13 +66,13 @@ func ListWater(db *sql.DB) func(*gin.Context) {
 			avgValue := sumValue / float64(len(water2))
 
 			re = append(re, Water{
-				Value:    avgValue,
-				Time : timestamp,
+				Value: avgValue,
+				Time:  timestamp,
 			})
 		}
 		sort.Sort(Dura(re))
-		
-		c.JSON(http.StatusOK,gin.H{
+
+		c.JSON(http.StatusOK, gin.H{
 			"waterList": re,
 		})
 	}

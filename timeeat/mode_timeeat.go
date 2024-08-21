@@ -1,15 +1,15 @@
-package food
+package timeeat
 
-type Food struct {
-	Value float64 `json:"value" sql:"value"`
+type Timeeat struct {
+	Value float64 `json:"value" sql:"timeeat"`
 	Time  uint64  `json:"time" sql:"time_taken"`
 }
 
-func (Food) TableName() string {
-	return "food"
+func (Timeeat) TableName() string {
+	return "timeeat"
 }
 
-type Dura []Food
+type Dura []Timeeat
 
 func (a Dura) Len() int           { return len(a) }
 func (a Dura) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }

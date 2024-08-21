@@ -1,4 +1,4 @@
-package food
+package timeeat
 
 import (
 	"database/sql"
@@ -11,32 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateFood(db *sql.DB) func(*gin.Context) {
-	return func(c *gin.Context){
-		var env Food
-		if err := c.ShouldBind(&env); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		exec := fmt.Sprintf(`insert into %s (value,time_taken)
-		value (?,?)`, Food{}.TableName())
-		_,err := db.Exec(exec, env.Value, env.Time)
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		c.JSON(http.StatusOK,true)
-	}
-}
-
-
-func ListFood(db *sql.DB) func(*gin.Context) {
+func ListTimeeat(db *sql.DB) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var reDate common.Star_End_Day
 
@@ -44,19 +19,19 @@ func ListFood(db *sql.DB) func(*gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
-			return 
+			return
 		}
 
-		query := fmt.Sprintf(`SELECT * from %s  where time_taken between %d and %d`, Food{}.TableName(), reDate.StartDate, reDate.EndDate)
+		query := fmt.Sprintf(`SELECT * from %s  where time_taken between %d and %d`, Timeeat{}.TableName(), reDate.StartDate, reDate.EndDate)
 		rows, err := db.Query(query)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
-			return 
+			return
 		}
-		var fd Food
-		var listFD []Food
+		var fd Timeeat
+		var listFD []Timeeat
 		for rows.Next() {
 			err = rows.Scan(&fd.Value, &fd.Time)
 
@@ -64,12 +39,13 @@ func ListFood(db *sql.DB) func(*gin.Context) {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"error": err.Error(),
 				})
-				return 
+				return
 			}
 			listFD = append(listFD, fd)
 		}
-		sub := make([]Food, 0)
-		for _,Food1 := range listFD {
+
+		sub := make([]Timeeat, 0)
+		for _, Food1 := range listFD {
 			timeStamp := time.Unix(int64(Food1.Time), 0)
 			startOfDay := time.Date(timeStamp.Year(), timeStamp.Month(), timeStamp.Day(), 0, 0, 0, 0, timeStamp.Location())
 			startOfDayUnix := startOfDay.Unix()
@@ -77,12 +53,12 @@ func ListFood(db *sql.DB) func(*gin.Context) {
 			sub = append(sub, Food1)
 		}
 
-		groupedData := make(map[uint64][]Food)
+		groupedData := make(map[uint64][]Timeeat)
 		for _, d := range sub {
 			groupedData[d.Time] = append(groupedData[d.Time], d)
 		}
 
-		var re []Food
+		re := make([]Timeeat, 0)
 		for timestamp, food2 := range groupedData {
 			var sumValue float64
 			for _, food3 := range food2 {
@@ -90,14 +66,14 @@ func ListFood(db *sql.DB) func(*gin.Context) {
 			}
 			avgValue := sumValue / float64(len(food2))
 
-			re = append(re, Food{
-				Value:    avgValue,
-				Time : timestamp,
+			re = append(re, Timeeat{
+				Value: avgValue,
+				Time:  timestamp,
 			})
 		}
 		sort.Sort(Dura(re))
-		
-		c.JSON(http.StatusOK,gin.H{
+
+		c.JSON(http.StatusOK, gin.H{
 			"feedList": re,
 		})
 	}

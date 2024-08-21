@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"go-module/database"
 	"go-module/environment"
-	"go-module/food"
 	"go-module/gallery"
 	"go-module/log"
 	"go-module/schedule"
+	"go-module/timeeat"
 	"go-module/video"
 	"go-module/water"
 	"strconv"
@@ -19,7 +19,7 @@ import (
 )
 
 func Sub(client mqtt.Client) {
-	topics := []string{"device_state", "add_image", "add_video", "request_feed_time", "dev_info", "log", "time_eat", "water_added"}
+	topics := []string{"sensor_state", "add_image", "add_video", "request_feed_time", "dev_info", "log", "time_eat", "water_added"}
 	for _, topic := range topics {
 		token := client.Subscribe(topic, 1, nil)
 		token.Wait()
@@ -30,8 +30,8 @@ func Sub(client mqtt.Client) {
 type Sensor_State struct {
 	Temperature float64 `json:"temp" `
 	Humidity    float64 `json:"humid" `
-	Food        int `json:"food" `
-	Water       int `json:"water" `
+	Food        float64 `json:"food" `
+	Water       float64 `json:"water" `
 }
 
 type Image struct {
@@ -56,16 +56,18 @@ func Received_Dev_Info(payload []byte) {
 }
 
 func Reiceve_Sensor_State(payload []byte) {
-	json.Unmarshal(payload, &HomeData)
+	err := json.Unmarshal(payload, &HomeData)
+	if err != nil {
+		fmt.Println("Line 61", err.Error())
+	}
 	nowsub := time.Now()
 	now := nowsub.Unix()
-	exec := fmt.Sprintf(`insert into %s (temperature,humidity,time_taken)
-	values (?,?,?)`, environment.Environment{}.TableName())
-	_, err := database.DB.Exec(exec, HomeData.Temperature, HomeData.Humidity, now)
+	exec := fmt.Sprintf(`insert into %s (temperature, humidity, food, water, time_taken)
+	values (?,?,?,?,?)`, environment.Environment{}.TableName())
+	_, err = database.DB.Exec(exec, HomeData.Temperature, HomeData.Humidity, HomeData.Food, HomeData.Water, now)
 
 	if err != nil {
-		fmt.Println("Reiceve_Sensor_State error:", err)
-
+		fmt.Println("Reiceve_Sensor_State Sensor error:", err)
 	}
 }
 
@@ -88,11 +90,11 @@ func Reiceve_food(payload []byte) {
 	currentTime := time.Now()
 	unixTimestamp := currentTime.Unix()
 
-	var ss food.Food
+	var ss timeeat.Timeeat
 	json.Unmarshal(payload, &ss)
 
 	exec := fmt.Sprintf(`insert into %s (food,time_taken)
-	values (?,?)`, food.Food{}.TableName())
+	values (?,?)`, timeeat.Timeeat{}.TableName())
 	_, err := database.DB.Exec(exec, ss.Value, unixTimestamp)
 
 	if err != nil {
@@ -147,15 +149,15 @@ func Reiceve_log(payload []byte) {
 }
 
 func Write_feed_time(client mqtt.Client) {
-	query := fmt.Sprintf(`SELECT * from db.%s`, schedule.Schedule{}.TableName())
+	query := fmt.Sprintf(`SELECT id, feed_value, feed_time, feed_duration, url, isOn FROM %s WHERE isOn = 1`, schedule.Schedule{}.TableName())
 	rows, err := database.DB.Query(query)
 	if err != nil {
 		fmt.Println("Write_feed_time error:", err)
 	}
 	var sche schedule.Schedule
-	var listSche []schedule.Schedule
+	listSche := make([]schedule.Schedule, 0)
 	for rows.Next() {
-		err = rows.Scan(&sche.ID, &sche.Value, &sche.Time, &sche.IsOn)
+		err = rows.Scan(&sche.ID, &sche.Value, &sche.Time, &sche.Feed_Duration, &sche.Url, &sche.IsOn)
 		if err != nil {
 			fmt.Println("Write_feed_time error:", err)
 		}
@@ -166,36 +168,34 @@ func Write_feed_time(client mqtt.Client) {
 	}
 	var payload string
 	for _, schedu := range listSche {
-		v := schedu.IsOn
 		tmp := strings.Split(schedu.Time, ":")
 		hours, err := strconv.ParseInt(tmp[0], 10, 8)
 		if err != nil {
 			hours = 25
 		}
-		minutes, err := strconv.ParseInt(tmp[0], 10, 8)
+		minutes, err := strconv.ParseInt(tmp[1], 10, 8)
 		if err != nil {
 			minutes = 61
 		}
-		if bool(v) {
-			payload += fmt.Sprintf("{%d %d fake_url %d %d}", hours, minutes, schedu.Value, sche.Feed_Duration)
-		}
+		payload += fmt.Sprintf("{%d %d fake_url %d %d}", hours, minutes, schedu.Value, sche.Feed_Duration)
 	}
-	token := client.Publish("write_feed_time", 0, false, payload)
-	token.Wait()
+	client.Publish("write_feed_time", 2, false, payload)
 
 }
 
 func Write_Feed_Now(client mqtt.Client) {
-	token := client.Publish("feed_now", 0, false, 1)
-	token.Wait()
+	client.Publish("feed_now", 2, false, "1")
 }
 
 func Write_Restart(client mqtt.Client) {
-	token := client.Publish("restart", 0, false, nil)
-	token.Wait()
+	client.Publish("restart", 2, false, "1")
 }
 
 func Write_Callfunc(client mqtt.Client) {
-	token := client.Publish("call", 0, false, "fake_url")
-	token.Wait()
+	client.Publish("call", 2, false, "fake_url")
+}
+
+func Write_DevInfo(client mqtt.Client) {
+	token := client.Publish("get_dev_info", 2, false, "1")
+	token.WaitTimeout(time.Second)
 }

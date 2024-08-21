@@ -105,10 +105,10 @@ func GetHomeData(db *sql.DB) func(*gin.Context) {
 			}
 
 			next.Time = next.Time[:5]
-			next.Time = next.Time[:2] + next.Time[3:]
+			next.Time = next.Time[:2] + next.Time[2:]
 
 			previous.Time = previous.Time[:5]
-			previous.Time = previous.Time[:2] + previous.Time[3:]
+			previous.Time = previous.Time[:2] + previous.Time[2:]
 
 			c.JSON(http.StatusOK, gin.H{
 				"food":  mqttServer.HomeData.Food,
@@ -116,12 +116,14 @@ func GetHomeData(db *sql.DB) func(*gin.Context) {
 				"temp":  mqttServer.HomeData.Temperature,
 				"humid": mqttServer.HomeData.Humidity,
 				"nextFeed": gin.H{
-					"value": next.Value,
-					"time":  next.Time[:2] + next.Time[3:5],
+					"value":         next.Value,
+					"time":          next.Time[:2] + next.Time[3:5],
+					"feed_duration": next.Feed_Duration,
 				},
 				"prevFeed": gin.H{
-					"value": previous.Value,
-					"time":  previous.Time[:2] + previous.Time[3:5],
+					"value":         previous.Value,
+					"time":          previous.Time[:2] + previous.Time[3:5],
+					"feed_duration": previous.Feed_Duration,
 				},
 				"lastImg": gal,
 			})

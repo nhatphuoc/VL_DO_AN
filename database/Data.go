@@ -39,6 +39,8 @@ func CreateDB() (*sql.DB, error) {
 	_, err = db.Exec(`create table IF NOT EXISTS environment(
 		temperature double not null,
 		humidity double not null,
+		food double not null,
+		water double not null,
 		time_taken int UNSIGNED not null
 	);`)
 	if err != nil {
@@ -69,8 +71,8 @@ func CreateDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	_, err = db.Exec(`create table IF NOT EXISTS food(
-		food double not null,
+	_, err = db.Exec(`create table IF NOT EXISTS timeeat(
+		timeeat int UNSIGNED not null,
 		time_taken int UNSIGNED not null
 	);`)
 	if err != nil {

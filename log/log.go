@@ -9,7 +9,7 @@ import (
 )
 
 func CreateLog(db *sql.DB) func(*gin.Context) {
-	return func(c *gin.Context){
+	return func(c *gin.Context) {
 		var gal Log
 		if err := c.ShouldBind(&gal); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -20,7 +20,7 @@ func CreateLog(db *sql.DB) func(*gin.Context) {
 
 		exec := fmt.Sprintf(`insert into %s (url,time_taken)
 		value (?,?)`, Log{}.TableName())
-		_,err := db.Exec(exec, gal.Url, gal.Time)
+		_, err := db.Exec(exec, gal.Url, gal.Time)
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -28,7 +28,7 @@ func CreateLog(db *sql.DB) func(*gin.Context) {
 			})
 			return
 		}
-		c.JSON(http.StatusOK,true)
+		c.JSON(http.StatusOK, true)
 	}
 }
 
@@ -43,7 +43,7 @@ func ListLog(db *sql.DB) func(*gin.Context) {
 			return
 		}
 		var gal Log
-		var listGal []string
+		listGal := make([]Log, 0)
 		for rows.Next() {
 			err = rows.Scan(&gal.Url, &gal.Time)
 
@@ -53,7 +53,7 @@ func ListLog(db *sql.DB) func(*gin.Context) {
 				})
 				return
 			}
-			listGal = append(listGal, gal.Url)
+			listGal = append(listGal, gal)
 		}
 
 		c.JSON(http.StatusOK, gin.H{

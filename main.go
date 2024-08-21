@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"go-module/database"
 	"go-module/environment"
-	"go-module/food"
 	"go-module/gallery"
 	"go-module/home-data"
 	"go-module/log"
 	"go-module/mqttServer"
 	"go-module/schedule"
+	"go-module/timeeat"
 	"go-module/video"
 	"go-module/water"
 	"net/http"
@@ -92,7 +92,12 @@ func main() {
 	r7 := r.Group("/status")
 	{
 		r7.GET("/", func(c *gin.Context) {
-			c.JSON(http.StatusOK, mqttServer.DeviceInfomation)
+			mqttServer.Write_DevInfo(client)
+			if mqttServer.DeviceInfomation != nil {
+				c.JSON(http.StatusOK, mqttServer.DeviceInfomation)
+			} else {
+				c.JSON(http.StatusOK, mqttServer.Dev_Info{})
+			}
 		})
 	}
 
@@ -138,7 +143,7 @@ func main() {
 
 	r13 := r.Group("/food")
 	{
-		r13.POST("/", food.ListFood(database.DB))
+		r13.POST("/", timeeat.ListTimeeat(database.DB))
 	}
 
 	a.Run(":3000")
