@@ -43,7 +43,7 @@ func ListVideo(db *sql.DB) func(*gin.Context) {
 			return
 		}
 		var gal Video
-		var listGal []Video
+		listGal := make([]Video, 0)
 		for rows.Next() {
 			err = rows.Scan(&gal.Url, &gal.Time)
 

@@ -13,6 +13,7 @@ import (
 	"go-module/video"
 	"go-module/water"
 	"net/http"
+	"os"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -48,6 +49,8 @@ func main() {
 	}()
 
 	//client.Disconnect(250)
+	os.Setenv("TZ", "Asia/Ho_Chi_Minh")
+	fmt.Println("HoChiMinh Time", time.Now().Format(time.DateTime))
 
 	a := gin.Default()
 	a.Use(cors.Default())
@@ -57,6 +60,12 @@ func main() {
 
 	r1 := r.Group("/schedule")
 	{
+		r1.Use(func(ctx *gin.Context) {
+			ctx.Next()
+			if ctx.Request.Method == http.MethodPost || ctx.Request.Method == http.MethodDelete {
+				mqttServer.Write_feed_time(client)
+			}
+		})
 		r1.POST("/", schedule.CreateSchedule(database.DB))
 		r1.POST("/:id", schedule.UpdateSchedule(database.DB))
 		r1.GET("/", schedule.ListSchedule(database.DB))
@@ -96,7 +105,7 @@ func main() {
 			if mqttServer.DeviceInfomation != nil {
 				c.JSON(http.StatusOK, mqttServer.DeviceInfomation)
 			} else {
-				c.JSON(http.StatusOK, mqttServer.Dev_Info{})
+				c.JSON(http.StatusOK, gin.H{})
 			}
 		})
 	}

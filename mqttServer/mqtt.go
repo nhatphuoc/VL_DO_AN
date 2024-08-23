@@ -16,6 +16,7 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/gin-gonic/gin"
 )
 
 func Sub(client mqtt.Client) {
@@ -38,20 +39,17 @@ type Image struct {
 	Url string `json:"url" sql:"url"`
 }
 
-type Dev_Info struct {
-	Software string `json:"software"`
-	Ip       string `json:"ip"`
-	Board    string `json:"board"`
-	Wifi     string `json:"wifi"`
-}
+type Dev_Info gin.H
 
 var DevInfo Dev_Info
 var DeviceInfomation *Dev_Info = nil
 var HomeData Sensor_State
 
 func Received_Dev_Info(payload []byte) {
-	json.Unmarshal(payload, &DevInfo)
-
+	err := json.Unmarshal(payload, &DevInfo)
+	if err != nil {
+		fmt.Println("Line 51", err.Error())
+	}
 	DeviceInfomation = &DevInfo
 }
 
@@ -60,6 +58,7 @@ func Reiceve_Sensor_State(payload []byte) {
 	if err != nil {
 		fmt.Println("Line 61", err.Error())
 	}
+	fmt.Println(string(payload))
 	nowsub := time.Now()
 	now := nowsub.Unix()
 	exec := fmt.Sprintf(`insert into %s (temperature, humidity, food, water, time_taken)

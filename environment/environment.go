@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"go-module/common"
 	"net/http"
-	"sort"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -46,7 +44,7 @@ func ListEnvironment(db *sql.DB) func(*gin.Context) {
 			return
 		}
 
-		query := fmt.Sprintf(`SELECT * from %s  where time_taken between %d and %d`, Environment{}.TableName(), reDate.StartDate, reDate.EndDate)
+		query := fmt.Sprintf(`SELECT temperature, humidity, time_taken from %s where time_taken between %d and %d`, Environment{}.TableName(), reDate.StartDate, reDate.EndDate)
 		rows, err := db.Query(query)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -67,42 +65,9 @@ func ListEnvironment(db *sql.DB) func(*gin.Context) {
 			}
 			listEnv = append(listEnv, env)
 		}
-		sub := make([]Environment, 0)
-		for _,Env := range sub {
-			timeStamp := time.Unix(int64(Env.Time), 0)
-			startOfDay := time.Date(timeStamp.Year(), timeStamp.Month(), timeStamp.Day(), 0, 0, 0, 0, timeStamp.Location())
-			startOfDayUnix := startOfDay.Unix()
-			Env.Time = uint64(startOfDayUnix)
-			sub = append(sub, Env)
-		}
-
-		groupedData := make(map[uint64][]Environment)
-		for _, d := range sub {
-			groupedData[d.Time] = append(groupedData[d.Time], d)
-		}
-
-		var re []Environment
-		for timestamp, envirs := range groupedData {
-			var sumTemp, sumHumidity float64
-			for _, envir := range envirs {
-				sumTemp += float64(envir.Temperature)
-				sumHumidity += float64(envir.Humidity)
-			}
-			avgTemp := sumTemp / float64(len(envirs))
-			avgHumidity := sumHumidity / float64(len(envirs))
-
-			re = append(re, Environment{
-				Temperature: avgTemp,
-				Humidity:    avgHumidity,
-				Time : timestamp,
-			})
-		}
-
-		sort.Sort(Dura(re))
-
 
 		c.JSON(http.StatusOK, gin.H{
-			"environmentHistory": re,
+			"environmentHistory": listEnv,
 		})
 	}
 }

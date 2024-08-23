@@ -9,9 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 func CreateGallery(db *sql.DB) func(*gin.Context) {
-	return func(c *gin.Context){
+	return func(c *gin.Context) {
 		var gal Gallery
 		if err := c.ShouldBind(&gal); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -22,7 +21,7 @@ func CreateGallery(db *sql.DB) func(*gin.Context) {
 
 		exec := fmt.Sprintf(`insert into %s (url,time_taken)
 		values (?,?)`, Gallery{}.TableName())
-		_,err := db.Exec(exec, gal.Url, gal.Time)
+		_, err := db.Exec(exec, gal.Url, gal.Time)
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -30,7 +29,7 @@ func CreateGallery(db *sql.DB) func(*gin.Context) {
 			})
 			return
 		}
-		c.JSON(http.StatusOK,true)
+		c.JSON(http.StatusOK, true)
 	}
 }
 
@@ -45,8 +44,7 @@ func ListGallery(db *sql.DB) func(*gin.Context) {
 			return
 		}
 
-
-		query := fmt.Sprintf(`SELECT * from %s  where time_taken between %d and %d`, Gallery{}.TableName(), reDate.StartDate, reDate.EndDate)
+		query := fmt.Sprintf(`SELECT * from %s`, Gallery{}.TableName())
 		rows, err := db.Query(query)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -55,7 +53,7 @@ func ListGallery(db *sql.DB) func(*gin.Context) {
 			return
 		}
 		var gal Gallery
-		var listGal []Gallery
+		listGal := make([]Gallery, 0)
 		for rows.Next() {
 			err = rows.Scan(&gal.Url, &gal.Time)
 
@@ -68,7 +66,7 @@ func ListGallery(db *sql.DB) func(*gin.Context) {
 			listGal = append(listGal, gal)
 		}
 
-		c.JSON(http.StatusOK,gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"images": listGal,
 		})
 	}
