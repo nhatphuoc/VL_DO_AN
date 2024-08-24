@@ -45,6 +45,30 @@ var DevInfo Dev_Info
 var DeviceInfomation *Dev_Info = nil
 var HomeData Sensor_State
 
+type Client struct {
+	Name  string
+	Event chan string
+}
+
+var clients = make([]Client, 0)
+
+func AddClient(ctx *gin.Context) Client {
+	client := Client{Name: ctx.RemoteIP(), Event: make(chan string)}
+	clients = append(clients, client)
+	return client
+}
+
+func RemoveClient(client Client) {
+	index := 0
+	for i, cl := range clients {
+		if cl.Name == client.Name {
+			index = i
+			break
+		}
+	}
+	clients = append(clients[:index], clients[index+1:]...)
+}
+
 func Received_Dev_Info(payload []byte) {
 	err := json.Unmarshal(payload, &DevInfo)
 	if err != nil {
@@ -57,8 +81,12 @@ func Reiceve_Sensor_State(payload []byte) {
 	err := json.Unmarshal(payload, &HomeData)
 	if err != nil {
 		fmt.Println("Line 61", err.Error())
+		return
 	}
-	fmt.Println(string(payload))
+	for _, client := range clients {
+		fmt.Printf("Sending to %v\n", client.Name)
+		client.Event <- string(payload)
+	}
 	nowsub := time.Now()
 	now := nowsub.Unix()
 	exec := fmt.Sprintf(`insert into %s (temperature, humidity, food, water, time_taken)

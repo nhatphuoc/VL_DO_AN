@@ -55,6 +55,28 @@ func main() {
 	a := gin.Default()
 	a.Use(cors.Default())
 	a.Use(static.Serve("/", static.LocalFile("./static", true)))
+	a.GET("/sse", func(ctx *gin.Context) {
+		client := mqttServer.AddClient(ctx)
+		defer mqttServer.RemoveClient(client)
+		ctx.Set("Content-Type", "text/event-stream")
+		ctx.Set("Cache-Control", "no-cache")
+		ctx.Set("Connection", "keep-alive")
+		ctx.Writer.Flush()
+		for {
+			payload, more := <-client.Event
+			fmt.Println("Received payload")
+			if !more {
+				break
+			}
+			written, err := fmt.Fprintf(ctx.Writer, "data: %v\n\n", payload)
+			if err != nil {
+				fmt.Printf("From main.go:73, %v", err)
+			} else {
+				fmt.Printf("Number of bytes written: %v\n", written)
+			}
+			ctx.Writer.Flush()
+		}
+	})
 
 	r := a.Group("/api")
 
